@@ -1,6 +1,6 @@
 # obs-v4l2sink
 
-This plugin provides ability to output obs-studio image contents to v4l2 device . It is basically a Linux version of [obs-virtual-cam](https://github.com/CatxFish/obs-virtual-cam), but it only contains the sink part. You can use it with [v4l2loopback](https://github.com/umlaeute/v4l2loopback) to acheive cross-program image transfer.  
+This plugin provides output ability to v4l2 device . It is basically a Linux version of [obs-virtual-cam](https://github.com/CatxFish/obs-virtual-cam), but only contains the video sink part. You can use it with [v4l2loopback](https://github.com/umlaeute/v4l2loopback) to achieve cross-program image transfer.  
 
 # Usage with v4l2loopback
 - Make sure load v4l2loopback module and check device path of v4l2loopback.
