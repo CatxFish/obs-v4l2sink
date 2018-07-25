@@ -22,6 +22,9 @@ public:
 	explicit V4l2sinkProperties(QWidget *parent = 0);
 	~V4l2sinkProperties();
 	void enableStart(bool enable);
+	void setWarningText(const char *msg);
+	void closeEvent(QCloseEvent *event);
+	void saveSettings();
 
 private Q_SLOTS:
 	void onStart();

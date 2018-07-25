@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>230</x>
-     <y>160</y>
+     <y>180</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -30,7 +30,7 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>160</y>
+     <y>180</y>
      <width>89</width>
      <height>25</height>
     </rect>
@@ -42,10 +42,10 @@
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>41</x>
-     <y>41</y>
+     <x>42</x>
+     <y>43</y>
      <width>381</width>
-     <height>91</height>
+     <height>114</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -91,6 +91,13 @@
        </layout>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_warning">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

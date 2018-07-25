@@ -9,14 +9,19 @@
 #include "v4l2sink.h"
 #include "v4l2sinkproperties.h"
 
+#define V4L2SINK_SUCCESS_OPEN  0
+#define V4L2SINK_ERROR_OPEN    1
+#define V4L2SINK_ERROR_FORMAT  2
+#define V4L2SINK_ERROR_OTHER   3
+
 struct v4l2sink_data{
         obs_output_t *output = nullptr;
-	bool output_running = false;
+	bool active = false;
 	int v4l2_fd = 0;
-	int width = 1280;
-	int height = 720;
+	int width = 0;
+	int height = 0;
 	int frame_size = 0;
-	uint32_t format = V4L2_PIX_FMT_NV12;
+	uint32_t format = V4L2_PIX_FMT_YUYV;
 };
 
 static inline enum video_format v4l2_to_obs_video_format(uint_fast32_t format)
@@ -31,6 +36,7 @@ static inline enum video_format v4l2_to_obs_video_format(uint_fast32_t format)
 #ifdef V4L2_PIX_FMT_XBGR32
 	case V4L2_PIX_FMT_XBGR32: return VIDEO_FORMAT_BGRX;
 #endif
+	case V4L2_PIX_FMT_BGR32:  return VIDEO_FORMAT_BGRA;
 #ifdef V4L2_PIX_FMT_ABGR32
 	case V4L2_PIX_FMT_ABGR32: return VIDEO_FORMAT_BGRA;
 #endif
@@ -45,31 +51,30 @@ static inline uint32_t string_to_v4l2_format(const char* format)
 	else if(strcmp(format, V4L2SINK_YUV420)==0)
 		return V4L2_PIX_FMT_YUV420;
 	else if (strcmp(format, V4L2SINK_RGB32)==0)
-		return V4L2_PIX_FMT_ABGR32;
+		return V4L2_PIX_FMT_BGR32;
 	else
 		return V4L2_PIX_FMT_YUYV;
-
 }
 
 V4l2sinkProperties* prop;
 obs_output_t* v4l2_out;
 
-void v4l2skink_signal_init(const char *signal)
+void v4l2sink_signal_init(const char *signal)
 {
 	signal_handler_t *handler = v4l2sink_get_signal_handler();
 	signal_handler_add(handler,signal);
 }
 
-void v4l2skink_signal_stop(const char *msg)
+void v4l2sink_signal_stop(const char *msg, bool opening)
 {
 	struct calldata call_data;
 	calldata_init(&call_data);
 	calldata_set_string(&call_data, "msg", msg);
+	calldata_set_bool(&call_data,"opening",opening);
 	signal_handler_t *handler = v4l2sink_get_signal_handler();
 	signal_handler_signal(handler, "v4l2close", &call_data);
 	calldata_free(&call_data);
 }
-
 
 bool v4l2device_set_format(void *data,struct v4l2_format *format)
 {
@@ -99,13 +104,13 @@ int v4l2device_framesize(void *data)
 #ifdef V4L2_PIX_FMT_ABGR32
 	case V4L2_PIX_FMT_ABGR32: 
 #endif
+	case V4L2_PIX_FMT_BGR32:
 		return out_data->width * out_data->height * 4;				
 	}
-
 	return 0;
 }
 
-bool v4l2device_open(void *data)
+int v4l2device_open(void *data)
 {
 	v4l2sink_data *out_data = (v4l2sink_data*)data;
 	struct v4l2_format v4l2_fmt;
@@ -123,41 +128,52 @@ bool v4l2device_open(void *data)
 	obs_data_release(settings); 
 
 	if(out_data->v4l2_fd  < 0){
-		printf("device open fail\n");
-		return false;
+		printf("v4l2 device open fail\n");
+		return V4L2SINK_ERROR_OPEN;
 	}
 
 	if (ioctl(out_data->v4l2_fd, VIDIOC_QUERYCAP, &capability) < 0){ 
-		printf("device qureycap fail\n");		
-		return false;
+		printf("v4l2 device qureycap fail\n");		
+		return V4L2SINK_ERROR_FORMAT;
 	}
 
 	v4l2_fmt.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
 	ret = ioctl(out_data->v4l2_fd, VIDIOC_G_FMT, &v4l2_fmt);
 
 	if(ret<0){		
-		printf("device getformat fail\n");
-		return false;
+		printf("v4l2 device getformat fail\n");
+		return V4L2SINK_ERROR_FORMAT;
 	}
 
 	v4l2device_set_format(data,&v4l2_fmt);
 	ret = ioctl(out_data->v4l2_fd, VIDIOC_S_FMT, &v4l2_fmt);
 
 	if(ret<0){		
-		printf("device setformat fail\n");
-		return false;
+		printf("v4l2 device setformat fail\n");
+		return V4L2SINK_ERROR_FORMAT;
 	}
 
 	ret = ioctl(out_data->v4l2_fd, VIDIOC_G_FMT, &v4l2_fmt);
 
 	if(ret<0){		
-		printf("device getformat fail\n");
-		return false;
+		printf("v4l2 device getformat fail\n");
+		return V4L2SINK_ERROR_FORMAT;
 	}
+
+	if(out_data->format != v4l2_fmt.fmt.pix.pixelformat){
+		printf("v4l2 format not support\n");
+		return V4L2SINK_ERROR_FORMAT;
+	}
+
 
 	width = (int32_t)obs_output_get_width(out_data->output);
 	height = (int32_t)obs_output_get_height(out_data->output);
 	format = v4l2_to_obs_video_format(v4l2_fmt.fmt.pix.pixelformat);
+
+	if(format == VIDEO_FORMAT_NONE){
+		printf("v4l2 conversion format not support\n");
+		return V4L2SINK_ERROR_FORMAT;
+	}
 	
 	if(width!= v4l2_fmt.fmt.pix.width ||
 	height!= v4l2_fmt.fmt.pix.height ||
@@ -168,15 +184,16 @@ bool v4l2device_open(void *data)
 		conv.height = v4l2_fmt.fmt.pix.height;
 		out_data->frame_size = v4l2_fmt.fmt.pix.sizeimage;
 		obs_output_set_video_conversion(out_data->output,&conv);
-		printf("use conversion\n");
 	}
+	else
+		obs_output_set_video_conversion(out_data->output,NULL);
 
-	return true;
+	return V4L2SINK_SUCCESS_OPEN;
 }
 
 
 
-bool v4l2device_close(void *data)
+static bool v4l2device_close(void *data)
 {
 	v4l2sink_data *out_data = (v4l2sink_data*)data;
 	close(out_data->v4l2_fd);
@@ -207,29 +224,44 @@ static void *v4l2sink_create(obs_data_t *settings, obs_output_t *output)
 static bool v4l2sink_start(void *data)
 {
 	v4l2sink_data *out_data = (v4l2sink_data*)data;
-	video_t *video = obs_output_video(out_data->output);
 	out_data->width = (int32_t)obs_output_get_width(out_data->output);
 	out_data->height = (int32_t)obs_output_get_height(out_data->output);
+	int ret = v4l2device_open(data);
 
-	if(!v4l2device_open(data)){
-		v4l2skink_signal_stop("open_failed");
+	if(ret!= V4L2SINK_SUCCESS_OPEN){
+		switch (ret) {
+		case V4L2SINK_ERROR_OPEN: 
+			v4l2sink_signal_stop("device open failed", true);
+			break;
+		case V4L2SINK_ERROR_FORMAT:
+			v4l2sink_signal_stop("format not support", true);
+			break;
+		default:
+			v4l2sink_signal_stop("device open failed", true);
+		}
+		return false;
+	}
+	
+	if(!obs_output_can_begin_data_capture(out_data->output,0)){
+		v4l2sink_signal_stop("start failed", true);
 		return false;
 	}
 
-	out_data->output_running = true;
+	out_data->active = true;
 	return obs_output_begin_data_capture(out_data->output, 0);	
 }
 
 static void v4l2sink_stop(void *data, uint64_t ts)
 {
 	v4l2sink_data *out_data = (v4l2sink_data*)data;
-	struct calldata call_data;
 
-	if(out_data->output_running){
-		out_data->output_running = false;
+	if(out_data->active){
+		out_data->active = false;
+		obs_output_end_data_capture(out_data->output);	
 		v4l2device_close(data);
-		v4l2skink_signal_stop("stop");
+		v4l2sink_signal_stop("stop", false);
 	}
+	
 }
 
 obs_properties_t* v4l2sink_getproperties(void *data)
@@ -247,7 +279,7 @@ obs_properties_t* v4l2sink_getproperties(void *data)
 static void v4l2sink_videotick(void *param, struct video_data *frame)
 {
 	v4l2sink_data *out_data = (v4l2sink_data*)param;
-	if(out_data->output_running){
+	if(out_data->active){
 		size_t bytes = write(out_data->v4l2_fd, frame->data[0], 
 			out_data->frame_size);
 	}
@@ -275,6 +307,10 @@ bool obs_module_load(void)
 {
 	obs_output_info v4l2sink_info = create_output_info();
 	obs_register_output(&v4l2sink_info);
+	obs_data_t *settings = obs_data_create();
+	v4l2_out = obs_output_create("v4l2sink", "V4l2sink",settings, NULL);
+	obs_data_release(settings);
+	v4l2sink_signal_init("void v4l2close(string msg, bool opening)");
 
 	QMainWindow* main_window = (QMainWindow*)obs_frontend_get_main_window();
 	QAction *action = (QAction*)obs_frontend_add_tools_menu_qaction(
@@ -290,11 +326,6 @@ bool obs_module_load(void)
 	};
 
 	action->connect(action, &QAction::triggered, menu_cb);
-
-	obs_data_t *settings = obs_data_create();
-	v4l2_out = obs_output_create("v4l2sink", "V4l2sink",settings, NULL);
-	obs_data_release(settings);
-	v4l2skink_signal_init("void v4l2close(string msg)");
 
     	return true;
 }
