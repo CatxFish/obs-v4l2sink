@@ -45,3 +45,6 @@ set_target_properties(v4l2sink PROPERTIES PREFIX "")
 install(TARGETS v4l2sink
 	LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/obs-plugins)
 
+install(DIRECTORY locale/
+	DESTINATION "${CMAKE_INSTALL_PREFIX}/share/obs/obs-plugins/v4l2sink/locale")
+
