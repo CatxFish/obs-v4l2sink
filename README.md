@@ -4,6 +4,7 @@ This plugin provides output ability to v4l2 device . It is basically a Linux ver
 
 # Usage with v4l2loopback
 - Make sure [load v4l2loopback module](https://github.com/umlaeute/v4l2loopback#run) and check the device path.
+  - If using Chrome or Chromium you must use the option "exclusive_caps=1".
 - Open OBS and click tools > v4l2sink .
 - Fill device path and choose video format.
 - Click start.
