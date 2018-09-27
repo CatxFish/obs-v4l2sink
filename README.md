@@ -10,11 +10,20 @@ This plugin provides output ability to v4l2 device . It is basically a Linux ver
 - Click start.
 
 # Build
+- Install QT
+```
+sudo apt install qtbase5-dev
+```
+- Get obs-studio source code
+```
+git clone --recursive https://github.com/obsproject/obs-studio.git
+```
+- Build plugins
 ```
 git clone https://github.com/CatxFish/obs-v4l2sink.git
 cd obs-v4l2sink
 mkdir build && cd build
-cmake -DLIBOBS_INCLUDE_DIR="<libobs path>" -DCMAKE_INSTALL_PREFIX=/usr ..
+cmake -DLIBOBS_INCLUDE_DIR="../obs-studio/libobs" -DCMAKE_INSTALL_PREFIX=/usr ..
 make -j4
 sudo make install
 ``` 
