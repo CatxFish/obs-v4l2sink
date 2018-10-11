@@ -3,11 +3,16 @@
 This plugin provides output ability to v4l2 device . It is basically a Linux version of [obs-virtual-cam](https://github.com/CatxFish/obs-virtual-cam), but only contains the video sink part. You can use it with [v4l2loopback](https://github.com/umlaeute/v4l2loopback) to achieve cross-program image transfer between obs-studio and third party software supporting Video4Linux.  
 
 # Usage with v4l2loopback
-- Make sure [load v4l2loopback module](https://github.com/umlaeute/v4l2loopback#run) and check the device path.
-  - If using Chrome or Chromium you must use the option "exclusive_caps=1".
-- Open OBS and click tools > v4l2sink .
-- Fill device path and choose video format.
-- Click start.
+
+- Make sure to [load the v4l2loopback module][run-v4l2loopback] and check the Device Path.
+  - If using Chrome or Chromium you must use the option `exclusive_caps=1`.
+- Open OBS and select the menu entry `Tools > V4L2 Video Output`.
+- Fill in the Device Path and select the appropriate video format.
+- Click the `Start` button.
+
+![Property Window](docs/property-window.png)
+
+[run-v4l2loopback]: https://github.com/umlaeute/v4l2loopback#run
 
 # Build
 - Install QT
