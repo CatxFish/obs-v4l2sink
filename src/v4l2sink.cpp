@@ -22,6 +22,7 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdio.h>
 #include "v4l2sink.h"
 #include "v4l2sinkproperties.h"
 
@@ -31,7 +32,7 @@
 #define V4L2SINK_ERROR_OTHER   3
 
 struct v4l2sink_data{
-        obs_output_t *output = nullptr;
+	obs_output_t *output = nullptr;
 	bool active = false;
 	int v4l2_fd = 0;
 	int width = 0;
@@ -375,4 +376,3 @@ signal_handler_t* v4l2sink_get_signal_handler()
 {
 	return obs_output_get_signal_handler(v4l2_out);	
 }
-

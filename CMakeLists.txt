@@ -5,6 +5,7 @@ project(obs-v4l2sink)
 include(external/FindLibObs.cmake)
 find_package(LibObs REQUIRED)
 
+set (CMAKE_CXX_STANDARD 11)
 set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
