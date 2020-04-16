@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(obs-v4l2sink)
+include(GNUInstallDirs)
 
 
 include(external/FindLibObs.cmake)
@@ -44,8 +45,8 @@ endif()
 set_target_properties(v4l2sink PROPERTIES PREFIX "")
 
 install(TARGETS v4l2sink
-	LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/obs-plugins)
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/obs-plugins)
 
 install(DIRECTORY locale/
-	DESTINATION "${CMAKE_INSTALL_PREFIX}/share/obs/obs-plugins/v4l2sink/locale")
+	DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/obs/obs-plugins/v4l2sink/locale")
 
