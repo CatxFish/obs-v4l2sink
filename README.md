@@ -57,14 +57,14 @@ sudo make install
 
 #### Dependencies
 
-If you are compiling this on Fedora, I hardly recommend to install all the dependencies inside a container with the aid of `toolbox`
+If you are compiling this on Fedora, I would suggest installing the following dependencies inside a `toolbox` ([here](https://fedoramagazine.org/a-quick-introduction-to-toolbox-on-fedora/) you can learn more about it)
 
-- `Development Tools` group
+- `Development Tools` group (install with `sudo yum groupinstall "Development Tools"`)
     - `make`
     - `cmake`
     - `gcc`
 - `qt5-qtbase-devel`
-- RPM Fusion Free
+- RPM Fusion Free ([here](https://rpmfusion.org/Configuration) you can learn how to enable this repository)
     - `obs-studio-libs`
     - `obs-studio-devel`
 
@@ -92,10 +92,10 @@ The plugin will be installed inside `~/.config/obs-studio/plugins`
 
 #### Flatpak OBS
 
-If you are using Flatpak's OBS version, copy the plugin's files inside the application folder:
+If you are using the Flatpak OBS version, copy the plugin's files into the application folder:
 
 ```bash
 sudo cp -r $HOME/.config/obs-studio/plugins/v4l2sink/* /var/lib/flatpak/app/com.obsproject.Studio/x86_64/stable/active/files/
 ```
 
-Open OBS and navigate to the "Tools" drop-down: you will now see the V4L2 video output
+Open OBS and navigate to the "Tools" drop-down: you should now see the V4L2 video output
