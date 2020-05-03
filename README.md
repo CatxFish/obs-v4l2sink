@@ -30,25 +30,25 @@ issue #17][vcam#17].
 
 ## Build
 
-- Install QT
+- Install QT + dev packages
 
+Ubuntu/Debian:
 ```
-sudo apt install qtbase5-dev
-```
-
-- Get obs-studio source code
-
-```
-git clone --recursive https://github.com/obsproject/obs-studio.git
+sudo apt install qtbase5-dev libobs-dev
 ```
 
-- Build plugins
+Fedora 32:
+```
+sudo dnf install obs-studio-libs qt5-qtbase-devel
+```
+
+- Build plugin:
 
 ```
 git clone https://github.com/CatxFish/obs-v4l2sink.git
 cd obs-v4l2sink
 mkdir build && cd build
-cmake -DLIBOBS_INCLUDE_DIR="../../obs-studio/libobs" -DCMAKE_INSTALL_PREFIX=/usr ..
+cmake ..
 make -j4
 sudo make install
 ```

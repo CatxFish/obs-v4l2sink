@@ -25,18 +25,6 @@ if(DEFINED CMAKE_BUILD_TYPE)
 	endif()
 endif()
 
-find_path(LIBOBS_INCLUDE_DIR
-	NAMES obs.h
-	HINTS
-		ENV obsPath${_lib_suffix}
-		ENV obsPath
-		${obsPath}
-	PATHS
-		/usr/include /usr/local/include /opt/local/include /sw/include
-	PATH_SUFFIXES
-		libobs
-	)
-
 function(find_obs_lib base_name repo_build_path lib_name)
 	string(TOUPPER "${base_name}" base_name_u)
 
@@ -79,12 +67,13 @@ find_obs_lib(LIBOBS libobs obs)
 if(MSVC)
 	find_obs_lib(W32_PTHREADS deps/w32-pthreads w32-pthreads)
 endif()
-
+set(LIBOBS_CMAKE_PATH ${LibObs_DIR}/LibObsConfig.cmake)
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Libobs DEFAULT_MSG LIBOBS_LIB LIBOBS_INCLUDE_DIR)
-mark_as_advanced(LIBOBS_INCLUDE_DIR LIBOBS_LIB)
+find_package_handle_standard_args(Libobs DEFAULT_MSG LIBOBS_LIB LIBOBS_CMAKE_PATH)
+mark_as_advanced(LIBOBS_CMAKE_PATH LIBOBS_LIB)
 
 if(LIBOBS_FOUND)
+    include(${LIBOBS_CMAKE_PATH})
 	if(MSVC)
 		if (NOT DEFINED W32_PTHREADS_LIB)
 			message(FATAL_ERROR "Could not find the w32-pthreads library" )
@@ -92,16 +81,15 @@ if(LIBOBS_FOUND)
 
 		set(W32_PTHREADS_INCLUDE_DIR ${LIBOBS_INCLUDE_DIR}/../deps/w32-pthreads)
 	endif()
-
-	set(LIBOBS_INCLUDE_DIRS ${LIBOBS_INCLUDE_DIR} ${W32_PTHREADS_INCLUDE_DIR})
+    
+	set(LIBOBS_INCLUDE_DIRS ${LIBOBS_INCLUDE_DIRS} ${W32_PTHREADS_INCLUDE_DIR})
 	set(LIBOBS_LIBRARIES ${LIBOBS_LIB} ${W32_PTHREADS_LIB})
-	include(${LIBOBS_INCLUDE_DIR}/../cmake/external/ObsPluginHelpers.cmake)
 
 	# allows external plugins to easily use/share common dependencies that are often included with libobs (such as FFmpeg)
-	if(NOT DEFINED INCLUDED_LIBOBS_CMAKE_MODULES)
-		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LIBOBS_INCLUDE_DIR}/../cmake/Modules/")
+	if(DEFINED LIBOBS_CMAKE_MODULES)
+		set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${LIBOBS_CMAKE_MODULES}/cmake/Modules/")
 		set(INCLUDED_LIBOBS_CMAKE_MODULES true)
 	endif()
 else()
-	message(FATAL_ERROR "Could not find the libobs library" )
+	message(FATAL_ERROR "Could not find the libobs library ${LIBOBS_CMAKE_PATH}" )
 endif()
