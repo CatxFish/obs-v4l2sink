@@ -48,7 +48,7 @@ sudo dnf install obs-studio-libs qt5-qtbase-devel
 git clone https://github.com/CatxFish/obs-v4l2sink.git
 cd obs-v4l2sink
 mkdir build && cd build
-cmake ..
+cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 make -j4
 sudo make install
 ```
