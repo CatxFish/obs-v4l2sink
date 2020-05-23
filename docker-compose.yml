@@ -1,0 +1,16 @@
+version: '3'
+services:
+
+  fedora:
+    build: 
+      context: .
+      dockerfile: Dockerfile.fedora
+    volumes:
+      - .:/opt/src
+
+  debian:
+    build: 
+      context: .
+      dockerfile: Dockerfile.debian
+    volumes:
+      - .:/opt/src

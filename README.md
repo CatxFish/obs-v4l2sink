@@ -34,12 +34,14 @@ issue #17][vcam#17].
 
 Ubuntu/Debian:
 ```
-sudo apt install qtbase5-dev libobs-dev
+sudo apt install -y qtbase5-dev build-essential cmake apt-src
+sudo apt-get build-dep -y libobs-dev
+sudo apt-src install --location=/usr/src -i libobs-dev
 ```
 
 Fedora 32:
 ```
-sudo dnf install obs-studio-libs qt5-qtbase-devel
+sudo dnf install -y obs-studio-libs obs-studio-devel qt5-qtbase-devel cmake make automake gcc gcc-c++ --enablerepo=rpmfusion-free-updates
 ```
 
 - Build plugin:
@@ -51,4 +53,9 @@ mkdir build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/usr ..
 make -j4
 sudo make install
+```
+Docker:
+```
+docker-compose build
+docker-compose up
 ```

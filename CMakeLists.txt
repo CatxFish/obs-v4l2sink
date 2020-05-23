@@ -14,6 +14,8 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 
+file(GLOB_RECURSE FRONTEND_API_HEADER_PATH "/usr/*/*/obs-frontend-api.h")
+get_filename_component(FRONTEND_API_HEADER_DIR "${FRONTEND_API_HEADER_PATH}" DIRECTORY)
 
 set(virtualoutput_SOURCES
 	src/v4l2sink.cpp
@@ -23,9 +25,8 @@ set(virtualoutput_HEADERS
 	src/v4l2sink.h
 	src/v4l2sinkproperties.h)
 
-include_directories(
-	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api")
-	
+include_directories("${FRONTEND_API_HEADER_DIR}")
+
 add_library(v4l2sink MODULE
 	${virtualoutput_SOURCES}
 	${virtualoutput_HEADERS})

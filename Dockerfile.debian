@@ -1,0 +1,19 @@
+FROM debian:buster
+
+# workaround for lack of frontend-api headerfile
+RUN echo "deb-src http://deb.debian.org/debian buster main" >> /etc/apt/sources.list
+
+RUN apt update
+RUN apt install -y qtbase5-dev build-essential cmake apt-src
+RUN apt-get build-dep -y libobs-dev
+RUN apt-src install --location=/usr/src -i libobs-dev
+
+VOLUME /opt/src
+
+CMD /bin/bash && \
+    mkdir -p /opt/src/build-debian && \
+    cd /opt/src && \
+    rm -rf /opt/src/build-debian/* && \
+    cd /opt/src/build-debian && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr && \
+    make -j4
