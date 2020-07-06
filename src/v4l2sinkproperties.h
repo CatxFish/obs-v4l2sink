@@ -17,6 +17,8 @@
 #define V4L2SINKPROPERTIES_H
 
 #include <QDialog>
+#include <QMap>
+#include <QString>
 #include "v4l2sink.h"
 
 #define V4L2SINK_NV12   "NV12"
@@ -46,7 +48,9 @@ private Q_SLOTS:
 	void onStop();
 
 private:
+	void init_devices(const char* device);
 	Ui::V4l2sinkProperties *ui;
+	QMap<QString, QString> devices;
 };
 
 static void output_started(void *data, calldata_t *cd);
