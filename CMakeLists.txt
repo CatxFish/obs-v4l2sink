@@ -33,12 +33,6 @@ target_link_libraries(v4l2sink
 	Qt5::Core
 	Qt5::Widgets)
 
-if(ARCH EQUAL 64)
-	set(ARCH_NAME "x86_64")
-else()
-	set(ARCH_NAME "i686")
-endif()
-
 set_target_properties(v4l2sink PROPERTIES PREFIX "")
 
 install(TARGETS v4l2sink
