@@ -21,9 +21,6 @@ set(virtualoutput_HEADERS
 	src/v4l2sink.h
 	src/v4l2sinkproperties.h)
 
-include_directories(
-	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api")
-	
 add_library(v4l2sink MODULE
 	${virtualoutput_SOURCES}
 	${virtualoutput_HEADERS})
