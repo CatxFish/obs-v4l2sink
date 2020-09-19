@@ -59,11 +59,15 @@ sudo make install
 
 If you are compiling this on Fedora, I would suggest installing the following dependencies inside a `toolbox` ([here](https://fedoramagazine.org/a-quick-introduction-to-toolbox-on-fedora/) you can learn more about it)
 
+- QT Development, the package has the following name:
+    - `qt5-qtbase-devel`
+
 - `Development Tools` group (install with `sudo yum groupinstall "Development Tools"`)
-    - `make`
+
+- The following packages are not included in the Development Tools group, but are required:
     - `cmake`
-    - `gcc`
-- `qt5-qtbase-devel`
+    - `g++`
+
 - RPM Fusion Free ([here](https://rpmfusion.org/Configuration) you can learn how to enable this repository)
     - `obs-studio-libs`
     - `obs-studio-devel`
