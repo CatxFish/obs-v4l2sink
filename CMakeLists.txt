@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 3.5)
 project(obs-v4l2sink)
 
 
-include(external/FindLibObs.cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/external)
 find_package(LibObs REQUIRED)
 
-set (CMAKE_CXX_STANDARD 11)
+
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_PREFIX_PATH "${QTDIR}")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -24,14 +25,18 @@ set(virtualoutput_HEADERS
 	src/v4l2sinkproperties.h)
 
 include_directories(
+	"${LIBOBS_INCLUDE_DIR}"
 	"${LIBOBS_INCLUDE_DIR}/../UI/obs-frontend-api")
-	
+
+get_filename_component(LIBOBS_LIB LIBOBS_LIB_DIR DIRECTORY)
+link_directories("${LIBOBS_LIB_DIR}")
+
 add_library(v4l2sink MODULE
 	${virtualoutput_SOURCES}
 	${virtualoutput_HEADERS})
-	
+
 target_link_libraries(v4l2sink
-	libobs
+	obs
 	Qt5::Core
 	Qt5::Widgets)
 
