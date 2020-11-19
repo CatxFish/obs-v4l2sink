@@ -210,7 +210,7 @@ int v4l2device_open(void *data)
 
 
 
-static bool v4l2device_close(void *data)
+static void v4l2device_close(void *data)
 {
 	v4l2sink_data *out_data = (v4l2sink_data*)data;
 	close(out_data->v4l2_fd);
