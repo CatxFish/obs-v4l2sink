@@ -36,6 +36,12 @@ issue #17][vcam#17].
 sudo apt install qtbase5-dev
 ```
 
+- Install LibObs
+
+```
+sudo apt install libobs-dev
+```
+
 - Get obs-studio source code
 
 ```
