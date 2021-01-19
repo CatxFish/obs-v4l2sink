@@ -53,8 +53,23 @@ git clone --recursive https://github.com/obsproject/obs-studio.git
 ```
 git clone https://github.com/CatxFish/obs-v4l2sink.git
 cd obs-v4l2sink
-mkdir build && cd build
+mkdir build install && cd build
 cmake -DLIBOBS_INCLUDE_DIR="../../obs-studio/libobs" -DCMAKE_INSTALL_PREFIX=/usr ..
 make -j4
 sudo make install
+```
+
+- For snap install ONLY
+```
+mkdir build install && cd build
+cmake -DLIBOBS_INCLUDE_DIR="../../obs-studio/libobs" -DCMAKE_INSTALL_PREFIX=./install ..
+make install
+
+mkdir -p ~/snap/obs-studio/current/.config/obs-studio/plugins/v4l2sink/bin/64bit
+mkdir -p ~/snap/obs-studio/current/.config/obs-studio/plugins/v4l2sink/data/
+
+cp -r install/share/obs/obs-plugins/v4l2sink/locale ~/snap/obs-studio/current/.config/obs-studio/plugins/v4l2sink/data/
+cp install/lib/obs-plugins/v4l2sink.so ~/snap/obs-studio/current/.config/obs-studio/plugins/v4l2sink/bin/64bit
+
+chmod 0775 ~/snap/obs-studio/current/.config/obs-studio/plugins/v4l2sink/bin/64bit/v4l2sink.so
 ```
