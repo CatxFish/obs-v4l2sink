@@ -1,5 +1,10 @@
 # obs-v4l2sink
 
+**Notice: [OBS Studio 26.1](https://github.com/obsproject/obs-studio/releases/tag/26.1.0)
+officially provides virtual cam support, and can be used without installing this plugin.  
+See [issue (#56)](https://github.com/CatxFish/obs-v4l2sink/issues/56#issuecomment-753191690)
+for more information.**
+
 An [OBS Studio][obs-proj] plugin that provides output capabilities to a
 Video4Linux2 device. It is basically a Linux version of [obs-virtual-cam][vcam],
 but only contains the video sink part. You can use it with
