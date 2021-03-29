@@ -104,25 +104,25 @@ bool v4l2device_set_format(void *data,struct v4l2_format *format)
 }
 
 int v4l2device_framesize(void *data)
-{	
+{
 	v4l2sink_data *out_data = (v4l2sink_data*)data;
 	switch(out_data->format){
-	
-	case V4L2_PIX_FMT_YVYU:   
-	case V4L2_PIX_FMT_YUYV:   
-	case V4L2_PIX_FMT_UYVY: 
+
+	case V4L2_PIX_FMT_YVYU:
+	case V4L2_PIX_FMT_YUYV:
+	case V4L2_PIX_FMT_UYVY:
 		return out_data->width * out_data->height * 2;
-	case V4L2_PIX_FMT_YUV420: 
+	case V4L2_PIX_FMT_YUV420:
 	case V4L2_PIX_FMT_YVU420:
 		return out_data->width * out_data->height * 3 / 2;
 #ifdef V4L2_PIX_FMT_XBGR32
 	case V4L2_PIX_FMT_XBGR32:
 #endif
 #ifdef V4L2_PIX_FMT_ABGR32
-	case V4L2_PIX_FMT_ABGR32: 
+	case V4L2_PIX_FMT_ABGR32:
 #endif
 	case V4L2_PIX_FMT_BGR32:
-		return out_data->width * out_data->height * 4;				
+		return out_data->width * out_data->height * 4;
 	}
 	return 0;
 }
@@ -141,23 +141,23 @@ int v4l2device_open(void *data)
 		, O_RDWR);
 	out_data->format = string_to_v4l2_format(
 		obs_data_get_string(settings, "format"));
-	out_data->frame_size = v4l2device_framesize(data);	
-	obs_data_release(settings); 
+	out_data->frame_size = v4l2device_framesize(data);
+	obs_data_release(settings);
 
 	if(out_data->v4l2_fd  < 0){
 		printf("v4l2 device open fail\n");
 		return V4L2SINK_ERROR_OPEN;
 	}
 
-	if (ioctl(out_data->v4l2_fd, VIDIOC_QUERYCAP, &capability) < 0){ 
-		printf("v4l2 device qureycap fail\n");		
+	if (ioctl(out_data->v4l2_fd, VIDIOC_QUERYCAP, &capability) < 0){
+		printf("v4l2 device qureycap fail\n");
 		return V4L2SINK_ERROR_FORMAT;
 	}
 
 	v4l2_fmt.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
 	ret = ioctl(out_data->v4l2_fd, VIDIOC_G_FMT, &v4l2_fmt);
 
-	if(ret<0){		
+	if(ret<0){
 		printf("v4l2 device getformat fail\n");
 		return V4L2SINK_ERROR_FORMAT;
 	}
@@ -165,14 +165,14 @@ int v4l2device_open(void *data)
 	v4l2device_set_format(data,&v4l2_fmt);
 	ret = ioctl(out_data->v4l2_fd, VIDIOC_S_FMT, &v4l2_fmt);
 
-	if(ret<0){		
+	if(ret<0){
 		printf("v4l2 device setformat fail\n");
 		return V4L2SINK_ERROR_FORMAT;
 	}
 
 	ret = ioctl(out_data->v4l2_fd, VIDIOC_G_FMT, &v4l2_fmt);
 
-	if(ret<0){		
+	if(ret<0){
 		printf("v4l2 device getformat fail\n");
 		return V4L2SINK_ERROR_FORMAT;
 	}
@@ -191,13 +191,13 @@ int v4l2device_open(void *data)
 		printf("v4l2 conversion format not support\n");
 		return V4L2SINK_ERROR_FORMAT;
 	}
-	
+
 	if(width!= v4l2_fmt.fmt.pix.width ||
 	height!= v4l2_fmt.fmt.pix.height ||
 	format!= video_output_get_format(video)){
 		struct video_scale_info conv;
 		conv.format = format;
-		conv.width = v4l2_fmt.fmt.pix.width;	
+		conv.width = v4l2_fmt.fmt.pix.width;
 		conv.height = v4l2_fmt.fmt.pix.height;
 		out_data->frame_size = v4l2_fmt.fmt.pix.sizeimage;
 		obs_output_set_video_conversion(out_data->output,&conv);
@@ -213,7 +213,7 @@ int v4l2device_open(void *data)
 static void v4l2device_close(void *data)
 {
 	v4l2sink_data *out_data = (v4l2sink_data*)data;
-	close(out_data->v4l2_fd);
+	return close(out_data->v4l2_fd);
 }
 
 static const char *v4l2sink_getname(void *unused)
@@ -247,7 +247,7 @@ static bool v4l2sink_start(void *data)
 
 	if(ret!= V4L2SINK_SUCCESS_OPEN){
 		switch (ret) {
-		case V4L2SINK_ERROR_OPEN: 
+		case V4L2SINK_ERROR_OPEN:
 			v4l2sink_signal_stop("device open failed", true);
 			break;
 		case V4L2SINK_ERROR_FORMAT:
@@ -258,14 +258,14 @@ static bool v4l2sink_start(void *data)
 		}
 		return false;
 	}
-	
+
 	if(!obs_output_can_begin_data_capture(out_data->output,0)){
 		v4l2sink_signal_stop("start failed", true);
 		return false;
 	}
 
 	out_data->active = true;
-	return obs_output_begin_data_capture(out_data->output, 0);	
+	return obs_output_begin_data_capture(out_data->output, 0);
 }
 
 static void v4l2sink_stop(void *data, uint64_t ts)
@@ -274,11 +274,11 @@ static void v4l2sink_stop(void *data, uint64_t ts)
 
 	if(out_data->active){
 		out_data->active = false;
-		obs_output_end_data_capture(out_data->output);	
+		obs_output_end_data_capture(out_data->output);
 		v4l2device_close(data);
 		v4l2sink_signal_stop("stop", false);
 	}
-	
+
 }
 
 obs_properties_t* v4l2sink_getproperties(void *data)
@@ -297,7 +297,7 @@ static void v4l2sink_videotick(void *param, struct video_data *frame)
 {
 	v4l2sink_data *out_data = (v4l2sink_data*)param;
 	if(out_data->active){
-		size_t bytes = write(out_data->v4l2_fd, frame->data[0], 
+		size_t bytes = write(out_data->v4l2_fd, frame->data[0],
 			out_data->frame_size);
 	}
 }
@@ -344,7 +344,7 @@ bool obs_module_load(void)
 
 	action->connect(action, &QAction::triggered, menu_cb);
 
-    	return true;
+	return true;
 }
 
 void obs_module_unload()
@@ -364,7 +364,7 @@ void v4l2sink_enable(const char *dev_name, const char *format)
 	obs_data_set_string(settings, "format", format);
 	obs_output_update(v4l2_out,settings);
 	obs_data_release(settings);
-	obs_output_start(v4l2_out);	
+	obs_output_start(v4l2_out);
 }
 
 void v4l2sink_disable()
@@ -374,5 +374,5 @@ void v4l2sink_disable()
 
 signal_handler_t* v4l2sink_get_signal_handler()
 {
-	return obs_output_get_signal_handler(v4l2_out);	
+	return obs_output_get_signal_handler(v4l2_out);
 }
