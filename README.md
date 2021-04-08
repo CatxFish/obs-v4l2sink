@@ -33,7 +33,7 @@ issue #17][vcam#17].
 
 [run-v4l2loopback]: https://github.com/umlaeute/v4l2loopback#run
 
-## Build
+## Build [Debian]
 
 - Install QT
 
@@ -63,3 +63,54 @@ cmake -DLIBOBS_INCLUDE_DIR="../../obs-studio/libobs" -DCMAKE_INSTALL_PREFIX=/usr
 make -j4
 sudo make install
 ```
+
+## Build [RHEL/CentOS]
+
+#### Dependencies
+
+If you are compiling this on Fedora, I would suggest installing the following dependencies inside a `toolbox` ([here](https://fedoramagazine.org/a-quick-introduction-to-toolbox-on-fedora/) you can learn more about it)
+
+- QT Development, the package has the following name:
+    - `qt5-qtbase-devel`
+
+- `Development Tools` group (install with `sudo yum groupinstall "Development Tools"`)
+
+- The following packages are not included in the Development Tools group, but are required:
+    - `cmake`
+    - `g++`
+
+- RPM Fusion Free ([here](https://rpmfusion.org/Configuration) you can learn how to enable this repository)
+    - `obs-studio-libs`
+    - `obs-studio-devel`
+
+
+#### Build
+
+Download sources and prepare the build files
+
+```bash
+git clone --recursive https://github.com/obsproject/obs-studio.git
+git clone https://github.com/CatxFish/obs-v4l2sink.git
+cd obs-v4l2sink
+mkdir build && cd build
+```
+
+Compile and install the plugin
+
+```bash
+cmake -DLIBOBS_INCLUDE_DIR="../../obs-studio/libobs" -DCMAKE_INSTALL_PREFIX=/usr -DLIBOBS_LIB="/usr/lib64/libobs.so.0" -DCMAKE_INSTALL_PREFIX="${HOME}/.config/obs-studio/plugins/v4l2sink" ..
+make -j4
+make install
+```
+
+The plugin will be installed inside `~/.config/obs-studio/plugins`
+
+#### Flatpak OBS
+
+If you are using the Flatpak OBS version, copy the plugin's files into the application folder:
+
+```bash
+sudo cp -r $HOME/.config/obs-studio/plugins/v4l2sink/* /var/lib/flatpak/app/com.obsproject.Studio/x86_64/stable/active/files/
+```
+
+Open OBS and navigate to the "Tools" drop-down: you should now see the V4L2 video output
