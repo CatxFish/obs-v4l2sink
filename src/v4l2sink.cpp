@@ -26,10 +26,13 @@
 #include "v4l2sink.h"
 #include "v4l2sinkproperties.h"
 
-#define V4L2SINK_SUCCESS_OPEN  0
-#define V4L2SINK_ERROR_OPEN    1
-#define V4L2SINK_ERROR_FORMAT  2
-#define V4L2SINK_ERROR_OTHER   3
+#define V4L2SINK_SUCCESS_OPEN  					0
+#define V4L2SINK_ERROR_OPEN    					1
+#define V4L2SINK_DEVICE_QUERYCAP_FAIL   		2
+#define V4L2SINK_DEVICE_GETFORMAT_FAIL			3
+#define V4L2SINK_DEVICE_SETFORMAT_FAIL			4
+#define V4L2SINK_FORMAT_NOT_SUPPORT				5
+#define V4L2SINK_CONVERSION_FORMAT_NOT_SUPPORT	6
 
 struct v4l2sink_data{
 	obs_output_t *output = nullptr;
@@ -151,7 +154,7 @@ int v4l2device_open(void *data)
 
 	if (ioctl(out_data->v4l2_fd, VIDIOC_QUERYCAP, &capability) < 0){ 
 		printf("v4l2 device qureycap fail\n");		
-		return V4L2SINK_ERROR_FORMAT;
+		return V4L2SINK_DEVICE_QUERYCAP_FAIL;
 	}
 
 	v4l2_fmt.type = V4L2_BUF_TYPE_VIDEO_OUTPUT;
@@ -159,7 +162,7 @@ int v4l2device_open(void *data)
 
 	if(ret<0){		
 		printf("v4l2 device getformat fail\n");
-		return V4L2SINK_ERROR_FORMAT;
+		return V4L2SINK_DEVICE_GETFORMAT_FAIL;
 	}
 
 	v4l2device_set_format(data,&v4l2_fmt);
@@ -167,19 +170,19 @@ int v4l2device_open(void *data)
 
 	if(ret<0){		
 		printf("v4l2 device setformat fail\n");
-		return V4L2SINK_ERROR_FORMAT;
+		return V4L2SINK_DEVICE_SETFORMAT_FAIL;
 	}
 
 	ret = ioctl(out_data->v4l2_fd, VIDIOC_G_FMT, &v4l2_fmt);
 
 	if(ret<0){		
 		printf("v4l2 device getformat fail\n");
-		return V4L2SINK_ERROR_FORMAT;
+		return V4L2SINK_DEVICE_GETFORMAT_FAIL;
 	}
 
 	if(out_data->format != v4l2_fmt.fmt.pix.pixelformat){
 		printf("v4l2 format not support\n");
-		return V4L2SINK_ERROR_FORMAT;
+		return V4L2SINK_FORMAT_NOT_SUPPORT;
 	}
 
 
@@ -189,7 +192,7 @@ int v4l2device_open(void *data)
 
 	if(format == VIDEO_FORMAT_NONE){
 		printf("v4l2 conversion format not support\n");
-		return V4L2SINK_ERROR_FORMAT;
+		return V4L2SINK_CONVERSION_FORMAT_NOT_SUPPORT;
 	}
 	
 	if(width!= v4l2_fmt.fmt.pix.width ||
@@ -250,8 +253,20 @@ static bool v4l2sink_start(void *data)
 		case V4L2SINK_ERROR_OPEN: 
 			v4l2sink_signal_stop("device open failed", true);
 			break;
-		case V4L2SINK_ERROR_FORMAT:
+		case V4L2SINK_DEVICE_QUERYCAP_FAIL:
+			v4l2sink_signal_stop("device query cap fail", true);
+			break;
+		case V4L2SINK_DEVICE_GETFORMAT_FAIL:		
+			v4l2sink_signal_stop("device get format fail", true);
+			break;
+		case V4L2SINK_DEVICE_SETFORMAT_FAIL:		
+			v4l2sink_signal_stop("device set format fail", true);
+			break;
+		case V4L2SINK_FORMAT_NOT_SUPPORT:			
 			v4l2sink_signal_stop("format not support", true);
+			break;
+		case V4L2SINK_CONVERSION_FORMAT_NOT_SUPPORT:		
+			v4l2sink_signal_stop("conversion format not support", true);		
 			break;
 		default:
 			v4l2sink_signal_stop("device open failed", true);
