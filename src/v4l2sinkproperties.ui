@@ -79,11 +79,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QLineEdit" name="lineEdit_dev">
-          <property name="placeholderText">
-           <string>/dev/video0</string>
-          </property>
-         </widget>
+         <widget class="QComboBox" name="comboBox_device"/>
         </item>
         <item>
          <widget class="QComboBox" name="comboBox_format"/>
