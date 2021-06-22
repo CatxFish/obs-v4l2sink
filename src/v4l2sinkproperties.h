@@ -44,6 +44,7 @@ public:
 private Q_SLOTS:
 	void onStart();
 	void onStop();
+	void onComboChanged();
 
 private:
 	Ui::V4l2sinkProperties *ui;

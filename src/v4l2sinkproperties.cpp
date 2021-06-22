@@ -44,6 +44,7 @@ V4l2sinkProperties::V4l2sinkProperties(QWidget *parent) :
 	ui->comboBox_format->addItem(V4L2SINK_RGB32, V4L2SINK_RGB32);
 	ui->comboBox_format->setCurrentIndex(
 		ui->comboBox_format->findText(format));
+	connect(ui->comboBox_format, SIGNAL(currentIndexChanged(int)), this, SLOT(onComboChanged()));
 
 	ui->label_warning->setStyleSheet("QLabel { color : red; }");
 	enableStart(true);
@@ -97,6 +98,11 @@ void V4l2sinkProperties::onStart()
 void V4l2sinkProperties::onStop()
 {
 	v4l2sink_disable();
+}
+
+void V4l2sinkProperties::onComboChanged ()
+{
+	setWarningText("");
 }
 
 void V4l2sinkProperties::enableStart(bool enable)
